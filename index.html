@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buka Ebook Prompt</title>
+<style>
+  :root {
+    --bg1: #dbe8f5;
+    --bg2: #f4f8fc;
+    --card: #ffffff;
+    --text: #0f1d2e;
+    --muted: #5b6b7d;
+    --line: #d4dde8;
+    --field: #ffffff;
+    --blue1: #2a7bd0;
+    --blue2: #15579a;
+    --ok: #1f9d6b;
+    --err: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg1: #0e1a28;
+      --bg2: #15243a;
+      --card: #182436;
+      --text: #eaf1f8;
+      --muted: #9fb0c3;
+      --line: #2c3e55;
+      --field: #1d2c42;
+      --ok: #3cc690;
+      --err: #ff7b6b;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg1: #0e1a28;
+    --bg2: #15243a;
+    --card: #182436;
+    --text: #eaf1f8;
+    --muted: #9fb0c3;
+    --line: #2c3e55;
+    --field: #1d2c42;
+    --ok: #3cc690;
+    --err: #ff7b6b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--bg1), var(--bg2));
+    color: var(--text);
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Latar belakang samar, meniru daftar yang terkunci */
+  .backdrop {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    padding: 24px 16px; filter: blur(3px); opacity: .55;
+  }
+  .backdrop .row {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 14px 16px; margin: 0 auto 12px; max-width: 640px;
+  }
+  .backdrop .bar { height: 10px; border-radius: 5px; background: var(--line); margin: 8px 0; }
+  .backdrop .bar.short { width: 45%; }
+
+  .wrap {
+    position: relative; z-index: 1;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 16px; gap: 16px;
+  }
+
+  .card {
+    width: 100%; max-width: 420px;
+    background: var(--card); border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(15, 45, 85, .18);
+    overflow: hidden;
+  }
+  .card::before {
+    content: ""; display: block; height: 6px;
+    background: linear-gradient(90deg, var(--blue1), var(--blue2));
+  }
+  .inner { padding: 26px 24px 24px; }
+
+  h1 { font-size: 22px; line-height: 1.3; margin: 0 0 8px; font-weight: 800; }
+  .lead { margin: 0 0 20px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+  form { display: grid; gap: 12px; }
+  input {
+    width: 100%; height: 50px; padding: 0 16px;
+    border: 1px solid var(--line); border-radius: 12px;
+    background: var(--field); color: var(--text);
+    font: inherit; font-size: 15px; outline: none;
+  }
+  input::placeholder { color: var(--muted); }
+  input:focus { border-color: var(--blue1); box-shadow: 0 0 0 3px rgba(42, 123, 208, .18); }
+  input.invalid { border-color: var(--err); }
+
+  button, .btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 52px; margin-top: 6px;
+    border: 0; border-radius: 12px; cursor: pointer;
+    background: linear-gradient(180deg, var(--blue1), var(--blue2));
+    color: #fff; font: inherit; font-size: 16px; font-weight: 700;
+    text-decoration: none; box-shadow: 0 8px 18px rgba(21, 87, 154, .3);
+  }
+  button:disabled { opacity: .6; cursor: default; }
+
+  .note { margin: 14px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+  .msg { min-height: 18px; margin: 0; font-size: 13.5px; color: var(--err); }
+
+  .unlocked { display: none; text-align: center; }
+  .unlocked .tick {
+    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--ok); color: #fff; font-size: 28px;
+  }
+  .unlocked p { color: var(--muted); font-size: 15px; line-height: 1.55; margin: 0 0 18px; }
+
+  body.is-open .form-part { display: none; }
+  body.is-open .unlocked { display: block; }
+</style>
+</head>
+<body>
+
+<div class="backdrop" aria-hidden="true">
+  <div class="row"><div class="bar"></div><div class="bar short"></div></div>
+  <div class="row"><div class="bar"></div><div class="bar short"></div></div>
+  <div class="row"><div class="bar"></div><div class="bar short"></div></div>
+</div>
+
+<main class="wrap">
+  <section class="card">
+    <div class="inner">
+
+      <div class="form-part">
+        <h1>Buka kunci ebook prompt</h1>
+        <p class="lead">Isi data singkat di bawah, lalu link ebook akan terbuka. Gratis.</p>
+
+        <form id="unlockForm" novalidate>
+          <input id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
+          <input id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
+          <input id="inst" name="inst" type="text" placeholder="Instansi atau kampus" autocomplete="organization" required>
+          <p class="msg" id="msg" role="alert"></p>
+          <button type="submit" id="submitBtn">Buka ebook</button>
+        </form>
+
+        <p class="note">
+          Gratis. Data Anda hanya dipakai Riviera Publishing untuk mengirim hasil dan menindaklanjutinya lewat WhatsApp.
+          Dengan menekan tombol, Anda menyetujuinya.
+        </p>
+      </div>
+
+      <div class="unlocked" id="unlocked">
+        <div class="tick">&#10003;</div>
+        <h1>Ebook sudah terbuka</h1>
+        <p>Terima kasih. Klik tombol di bawah untuk membuka ebook prompt.</p>
+        <a class="btn" id="ebookLink" href="#" target="_blank" rel="noopener">Klaim ebook</a>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<script>
+  /* ===== KONFIGURASI ===== */
+  const CONFIG = {
+    // Link Google Drive file ebook (sebaiknya link yang bisa dibaca "Siapa saja yang punya link").
+    ebookLink: "https://drive.google.com/file/d/GANTI_FILE_ID/view",
+    // URL Web App Google Apps Script untuk menyimpan data peserta. Kosongkan jika belum dipasang.
+    formEndpoint: "",
+  };
+  /* ======================= */
+
+  const form = document.getElementById("unlockForm");
+  const msg = document.getElementById("msg");
+  const btn = document.getElementById("submitBtn");
+  const nameEl = document.getElementById("name");
+  const waEl = document.getElementById("wa");
+  const instEl = document.getElementById("inst");
+
+  document.getElementById("ebookLink").href = CONFIG.ebookLink;
+
+  function normalizeWA(raw) {
+    let d = (raw || "").replace(/\D/g, "");
+    if (d.startsWith("0")) d = "62" + d.slice(1);
+    return d;
+  }
+
+  function setInvalid(el, bad) {
+    el.classList.toggle("invalid", bad);
+  }
+
+  function validate() {
+    const name = nameEl.value.trim();
+    const wa = normalizeWA(waEl.value);
+    const inst = instEl.value.trim();
+    setInvalid(nameEl, name.length < 2);
+    setInvalid(waEl, wa.length < 9 || wa.length > 15);
+    setInvalid(instEl, inst.length < 2);
+    if (name.length < 2) return "Nama lengkap wajib diisi.";
+    if (wa.length < 9 || wa.length > 15) return "Nomor WhatsApp belum valid.";
+    if (inst.length < 2) return "Instansi atau kampus wajib diisi.";
+    return null;
+  }
+
+  function unlock() {
+    document.body.classList.add("is-open");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.textContent = "";
+    const error = validate();
+    if (error) { msg.textContent = error; return; }
+
+    const payload = {
+      nama: nameEl.value.trim(),
+      whatsapp: normalizeWA(waEl.value),
+      instansi: instEl.value.trim(),
+      waktu: new Date().toISOString(),
+    };
+
+    btn.disabled = true;
+    btn.textContent = "Memproses...";
+
+    try {
+      if (CONFIG.formEndpoint) {
+        // mode no-cors: respons tidak bisa dibaca, hanya error jaringan yang tertangkap
+        await fetch(CONFIG.formEndpoint, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        console.warn("[Ebook] formEndpoint belum diisi. Data tidak tersimpan.", payload);
+      }
+      unlock();
+    } catch (err) {
+      console.error("[Ebook] gagal kirim:", err);
+      msg.textContent = "Koneksi bermasalah. Coba lagi sebentar.";
+      btn.disabled = false;
+      btn.textContent = "Buka ebook";
+    }
+  });
+</script>
+</body>
+</html>
