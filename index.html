@@ -18,36 +18,14 @@
     --ok: #1f9d6b;
     --err: #c0392b;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg1: #0e1a28;
-      --bg2: #15243a;
-      --card: #182436;
-      --text: #eaf1f8;
-      --muted: #9fb0c3;
-      --line: #2c3e55;
-      --field: #1d2c42;
-      --ok: #3cc690;
-      --err: #ff7b6b;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg1: #0e1a28;
-    --bg2: #15243a;
-    --card: #182436;
-    --text: #eaf1f8;
-    --muted: #9fb0c3;
-    --line: #2c3e55;
-    --field: #1d2c42;
-    --ok: #3cc690;
-    --err: #ff7b6b;
-  }
-
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     min-height: 100vh;
-    background: linear-gradient(180deg, var(--bg1), var(--bg2));
+    background:
+      linear-gradient(115deg, transparent 38%, rgba(255,255,255,.75) 42%, transparent 46%),
+      linear-gradient(115deg, transparent 60%, rgba(255,255,255,.6) 63%, transparent 66%),
+      linear-gradient(180deg, var(--bg1), var(--bg2));
     color: var(--text);
     font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     overflow-x: hidden;
@@ -167,9 +145,9 @@
   /* ===== KONFIGURASI ===== */
   const CONFIG = {
     // Link Google Drive file ebook (sebaiknya link yang bisa dibaca "Siapa saja yang punya link").
-    ebookLink: "https://drive.google.com/file/d/GANTI_FILE_ID/view",
+    ebookLink: "https://drive.google.com/file/d/1m43D_3zPtBYRAgl4Zm2bQovebnwCdIAk/view?usp=sharing",
     // URL Web App Google Apps Script untuk menyimpan data peserta. Kosongkan jika belum dipasang.
-    formEndpoint: "",
+    formEndpoint: "https://script.google.com/macros/s/AKfycbxfaQsmp8iCoU6ET9W4C2ts8O7xwnQGNlJSrpg-OhVLcNku7zRM7X14_I4ZX2nNp1Uh/exec",
   };
   /* ======================= */
 
