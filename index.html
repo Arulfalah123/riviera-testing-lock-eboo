@@ -56,22 +56,74 @@
     box-shadow: 0 20px 50px rgba(15, 45, 85, .18);
     overflow: hidden;
   }
-  .card::before {
-    content: ""; display: block; height: 6px;
-    background: linear-gradient(90deg, var(--blue1), var(--blue2));
-  }
-  .inner { padding: 26px 24px 24px; }
+  .inner { padding: 0 0 24px; }
 
   .brand {
     display: flex; justify-content: center; align-items: center;
-    margin: -26px -24px 22px; padding: 16px 24px;
+    padding: 18px 24px;
     background: #0f1d2e;
   }
   .brand img { display: block; height: 36px; width: auto; max-width: 100%; }
 
-  h1 { font-size: 22px; line-height: 1.3; margin: 0 0 8px; font-weight: 800; }
-  .lead { margin: 0 0 20px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+  .body { padding: 22px 24px 0; }
 
+  h1 { font-size: 22px; line-height: 1.3; margin: 0 0 8px; font-weight: 800; }
+  .lead { margin: 0 0 16px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+  /* ===== Carousel pilihan ebook ===== */
+  .picker {
+    display: flex; gap: 12px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    scroll-padding: 0 24px;
+    padding: 4px 24px 6px;
+    margin: 0 -24px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .picker::-webkit-scrollbar { display: none; }
+
+  button.item {
+    flex: 0 0 68%; scroll-snap-align: center;
+    display: flex; flex-direction: column; align-items: stretch;
+    height: auto; margin: 0; padding: 10px;
+    background: var(--card); color: var(--text);
+    border: 2px solid var(--line); border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(15, 45, 85, .08);
+    font: inherit; text-align: left; cursor: pointer;
+    transition: border-color .2s, transform .2s, opacity .2s;
+    opacity: .75;
+  }
+  button.item.active { border-color: var(--blue1); opacity: 1; transform: translateY(-2px); }
+
+  .cover {
+    position: relative; height: 150px; border-radius: 10px; overflow: hidden;
+    background: linear-gradient(160deg, var(--c1), var(--c2));
+    color: #fff; padding: 14px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .cover::after {
+    content: ""; position: absolute; width: 140px; height: 140px; right: -40px; top: -40px;
+    border-radius: 50%; background: rgba(255,255,255,.14);
+  }
+  .cover .tag {
+    position: absolute; top: 10px; left: 10px; z-index: 1;
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    background: rgba(255,255,255,.22);
+  }
+  .cover .t { position: relative; z-index: 1; font-size: 18px; font-weight: 800; line-height: 1.2; }
+
+  .meta { padding: 10px 4px 2px; }
+  .meta strong { display: block; font-size: 14px; line-height: 1.35; }
+  .meta span { display: block; margin-top: 3px; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+  .dots { display: flex; justify-content: center; gap: 6px; margin: 8px 0 18px; }
+  .dot { width: 7px; height: 7px; border-radius: 4px; background: var(--line); transition: all .2s; }
+  .dot.on { width: 18px; background: var(--blue1); }
+
+  .picked { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); }
+  .picked b { color: var(--text); }
+
+  /* ===== Form ===== */
   form { display: grid; gap: 12px; }
   input {
     width: 100%; height: 50px; padding: 0 16px;
@@ -83,7 +135,7 @@
   input:focus { border-color: var(--blue1); box-shadow: 0 0 0 3px rgba(42, 123, 208, .18); }
   input.invalid { border-color: var(--err); }
 
-  button, .btn {
+  button.submit, .btn {
     display: flex; align-items: center; justify-content: center;
     width: 100%; height: 52px; margin-top: 6px;
     border: 0; border-radius: 12px; cursor: pointer;
@@ -91,7 +143,7 @@
     color: #fff; font: inherit; font-size: 16px; font-weight: 700;
     text-decoration: none; box-shadow: 0 8px 18px rgba(21, 87, 154, .3);
   }
-  button:disabled { opacity: .6; cursor: default; }
+  button.submit:disabled { opacity: .6; cursor: default; }
 
   .note { margin: 14px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
   .msg { min-height: 18px; margin: 0; font-size: 13.5px; color: var(--err); }
@@ -117,33 +169,43 @@
 
 <main class="wrap">
   <section class="card">
+    <div class="brand">
+      <img src="logo-riviera.png" alt="Riviera Publishing" height="36">
+    </div>
+
     <div class="inner">
 
       <div class="form-part">
-        <div class="brand">
-          <img src="logo-riviera.png" alt="Riviera Publishing" height="36">
+        <div class="body">
+          <h1>Buka kunci ebook prompt</h1>
+          <p class="lead">Pilih ebook, isi data singkat, lalu link akan terbuka. Gratis.</p>
         </div>
-        <h1>Buka kunci ebook prompt</h1>
-        <p class="lead">Isi data singkat di bawah, lalu link ebook akan terbuka. Gratis.</p>
 
-        <form id="unlockForm" novalidate>
-          <input id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
-          <input id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
-          <input id="inst" name="inst" type="text" placeholder="Instansi atau kampus" autocomplete="organization" required>
-          <p class="msg" id="msg" role="alert"></p>
-          <button type="submit" id="submitBtn">Buka ebook</button>
-        </form>
+        <div class="picker" id="picker" aria-label="Pilih ebook"></div>
+        <div class="dots" id="dots" aria-hidden="true"></div>
 
-        <p class="note">
-          Gratis. Data Anda hanya dipakai Riviera Publishing untuk mengirim hasil dan menindaklanjutinya lewat WhatsApp.
-          Dengan menekan tombol, Anda menyetujuinya.
-        </p>
+        <div class="body">
+          <p class="picked" id="picked"></p>
+
+          <form id="unlockForm" novalidate>
+            <input id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
+            <input id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
+            <input id="inst" name="inst" type="text" placeholder="Instansi atau kampus" autocomplete="organization" required>
+            <p class="msg" id="msg" role="alert"></p>
+            <button type="submit" class="submit" id="submitBtn">Buka ebook</button>
+          </form>
+
+          <p class="note">
+            Gratis. Data Anda hanya dipakai Riviera Publishing untuk mengirim hasil dan menindaklanjutinya lewat WhatsApp.
+            Dengan menekan tombol, Anda menyetujuinya.
+          </p>
+        </div>
       </div>
 
-      <div class="unlocked" id="unlocked">
+      <div class="unlocked body" id="unlocked">
         <div class="tick">&#10003;</div>
         <h1>Ebook sudah terbuka</h1>
-        <p>Terima kasih. Klik tombol di bawah untuk membuka ebook prompt.</p>
+        <p id="unlockedTitle"></p>
         <a class="btn" id="ebookLink" href="#" target="_blank" rel="noopener">Klaim ebook</a>
       </div>
 
@@ -153,22 +215,103 @@
 
 <script>
   /* ===== KONFIGURASI ===== */
-  const CONFIG = {
-    // Link Google Drive file ebook (sebaiknya link yang bisa dibaca "Siapa saja yang punya link").
-    ebookLink: "https://drive.google.com/drive/folders/1DEPeknzpVIE5HdkvyiYVZuVrMjbyly-k?usp=drive_link",
-    // URL Web App Google Apps Script untuk menyimpan data peserta. Kosongkan jika belum dipasang.
-    formEndpoint: "https://script.google.com/macros/s/AKfycbxfaQsmp8iCoU6ET9W4C2ts8O7xwnQGNlJSrpg-OhVLcNku7zRM7X14_I4ZX2nNp1Uh/exec",
-  };
+  // Daftar ebook yang bisa dipilih di carousel. Tambah/ubah item di sini.
+  const EBOOKS = [
+    {
+      title: "Prompt Artikel",
+      subtitle: "Prompt siap pakai untuk menyusun artikel jurnal",
+      tag: "Prompt",
+      link: "https://drive.google.com/file/d/1m43D_3zPtBYRAgl4Zm2bQovebnwCdIAk/view?usp=sharing",
+      colors: ["#2a7bd0", "#15579a"],
+    },
+    {
+      title: "Prompt Skripsi & Tesis ke Artikel",
+      subtitle: "Ubah skripsi atau tesis menjadi naskah jurnal",
+      tag: "Prompt",
+      link: "https://drive.google.com/file/d/1ev5nOLsVlx0io2tQQyX4Eydt4TtC2bOj/view?usp=sharing",
+      colors: ["#1f9d6b", "#0f6b4a"],
+    },
+    {
+      title: "From Zero to Publish",
+      subtitle: "Panduan dari nol sampai naskah terbit",
+      tag: "Panduan",
+      link: "https://drive.google.com/file/d/1syij8LL2aip4wmb7XfowlHVOnQQ0ZNd9/view?usp=sharing",
+      colors: ["#7a4fd6", "#4a2a9c"],
+    },
+  ];
+
+  // URL Web App Google Apps Script untuk menyimpan data peserta. Kosongkan jika belum dipasang.
+  const FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbxfaQsmp8iCoU6ET9W4C2ts8O7xwnQGNlJSrpg-OhVLcNku7zRM7X14_I4ZX2nNp1Uh/exec";
   /* ======================= */
 
-  const form = document.getElementById("unlockForm");
-  const msg = document.getElementById("msg");
-  const btn = document.getElementById("submitBtn");
-  const nameEl = document.getElementById("name");
-  const waEl = document.getElementById("wa");
-  const instEl = document.getElementById("inst");
+  const $ = (id) => document.getElementById(id);
+  const form = $("unlockForm");
+  const msg = $("msg");
+  const btn = $("submitBtn");
+  const nameEl = $("name");
+  const waEl = $("wa");
+  const instEl = $("inst");
+  const picker = $("picker");
+  const dotsEl = $("dots");
+  const pickedEl = $("picked");
 
-  document.getElementById("ebookLink").href = CONFIG.ebookLink;
+  let selected = 0;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function renderPicker() {
+    picker.innerHTML = EBOOKS.map((b, i) => `
+      <button type="button" class="item" data-i="${i}" aria-label="${esc(b.title)}"
+        style="--c1:${b.colors[0]};--c2:${b.colors[1]}">
+        <div class="cover">
+          <span class="tag">${esc(b.tag)}</span>
+          <span class="t">${esc(b.title)}</span>
+        </div>
+        <div class="meta">
+          <strong>${esc(b.title)}</strong>
+          <span>${esc(b.subtitle)}</span>
+        </div>
+      </button>`).join("");
+    dotsEl.innerHTML = EBOOKS.map(() => '<span class="dot"></span>').join("");
+  }
+
+  function select(i, scroll) {
+    selected = i;
+    const items = picker.querySelectorAll(".item");
+    items.forEach((el, idx) => el.classList.toggle("active", idx === i));
+    dotsEl.querySelectorAll(".dot").forEach((el, idx) => el.classList.toggle("on", idx === i));
+    pickedEl.innerHTML = `Ebook dipilih: <b>${esc(EBOOKS[i].title)}</b>`;
+    if (scroll && items[i]) {
+      items[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }
+
+  // Saat carousel digeser, pilih item yang paling dekat ke tengah
+  let scrollTimer = null;
+  picker.addEventListener("scroll", () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const center = picker.getBoundingClientRect().left + picker.clientWidth / 2;
+      let best = selected, bestDist = Infinity;
+      picker.querySelectorAll(".item").forEach((el, idx) => {
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs(r.left + r.width / 2 - center);
+        if (dist < bestDist) { bestDist = dist; best = idx; }
+      });
+      if (best !== selected) select(best, false);
+    }, 80);
+  }, { passive: true });
+
+  picker.addEventListener("click", (e) => {
+    const item = e.target.closest(".item");
+    if (!item) return;
+    select(Number(item.dataset.i), true);
+  });
+
+  renderPicker();
+  select(0, false);
 
   function normalizeWA(raw) {
     let d = (raw || "").replace(/\D/g, "");
@@ -194,6 +337,9 @@
   }
 
   function unlock() {
+    const book = EBOOKS[selected];
+    $("ebookLink").href = book.link;
+    $("unlockedTitle").textContent = book.title;
     document.body.classList.add("is-open");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -208,6 +354,7 @@
       nama: nameEl.value.trim(),
       whatsapp: normalizeWA(waEl.value),
       instansi: instEl.value.trim(),
+      ebook: EBOOKS[selected].title,
       waktu: new Date().toISOString(),
     };
 
@@ -215,16 +362,16 @@
     btn.textContent = "Memproses...";
 
     try {
-      if (CONFIG.formEndpoint) {
+      if (FORM_ENDPOINT) {
         // mode no-cors: respons tidak bisa dibaca, hanya error jaringan yang tertangkap
-        await fetch(CONFIG.formEndpoint, {
+        await fetch(FORM_ENDPOINT, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload),
         });
       } else {
-        console.warn("[Ebook] formEndpoint belum diisi. Data tidak tersimpan.", payload);
+        console.warn("[Ebook] FORM_ENDPOINT belum diisi. Data tidak tersimpan.", payload);
       }
       unlock();
     } catch (err) {
