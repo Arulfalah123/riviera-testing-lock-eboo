@@ -25,13 +25,7 @@
     font-family: "Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color: var(--text);
     -webkit-font-smoothing: antialiased;
-    /* Latar hijau buram, warna diambil dari referensi */
-    background:
-      radial-gradient(55% 45% at 100% 0%, #a39a2b 0%, rgba(163, 154, 43, 0) 70%),
-      radial-gradient(45% 35% at 50% 0%, #7a7c1d 0%, rgba(122, 124, 29, 0) 75%),
-      radial-gradient(60% 50% at 0% 50%, #2f5a13 0%, rgba(47, 90, 19, 0) 70%),
-      linear-gradient(180deg, #4b6519 0%, #4a6a1a 45%, #1d3112 100%);
-    background-attachment: fixed;
+    background: var(--paper);
   }
 
   /* ===== Layar aplikasi (putih, sudut tajam seperti referensi) ===== */
@@ -40,9 +34,6 @@
     background: var(--paper);
     padding: 12px 20px 32px;
     overflow: hidden;
-  }
-  @media (min-width: 600px) {
-    .screen { min-height: 0; margin: 48px auto; box-shadow: 0 30px 70px rgba(0, 0, 0, .35); }
   }
 
   /* Header */
@@ -172,7 +163,7 @@
 
   /* ===== Laptop / desktop: layar melebar, dua kolom ===== */
   @media (min-width: 900px) {
-    .screen { max-width: 1120px; margin: 40px auto; padding: 20px 56px 56px; }
+    .screen { max-width: 1120px; padding: 24px 56px 64px; }
     .hdr { height: 60px; }
     .logo { height: 30px; }
     .big { margin-top: 28px; font-size: clamp(72px, 7.5vw, 104px); }
