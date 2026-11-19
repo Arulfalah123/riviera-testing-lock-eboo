@@ -2,302 +2,278 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Buka Ebook Prompt</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fdfdfd">
+<title>Ebook Gratis · Riviera Publishing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg1: #dbe8f5;
-    --bg2: #f4f8fc;
-    --card: #ffffff;
-    --text: #0f1d2e;
-    --muted: #5b6b7d;
-    --line: #d4dde8;
-    --field: #ffffff;
-    --blue1: #2a7bd0;
-    --blue2: #15579a;
-    --ok: #1f9d6b;
+    --paper: #fdfdfd;
+    --ink: #000000;
+    --text: #111111;
+    --grey: #8a8a8a;
+    --line: #e4e4e4;
+    --chip: #e6e6e6;
     --err: #c0392b;
-    --ink: #0b0b0c;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     min-height: 100vh;
-    background:
-      linear-gradient(115deg, transparent 38%, rgba(255,255,255,.75) 42%, transparent 46%),
-      linear-gradient(115deg, transparent 60%, rgba(255,255,255,.6) 63%, transparent 66%),
-      linear-gradient(180deg, var(--bg1), var(--bg2));
+    font-family: "Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color: var(--text);
-    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    /* Latar hijau buram, warna diambil dari referensi */
+    background:
+      radial-gradient(55% 45% at 100% 0%, #a39a2b 0%, rgba(163, 154, 43, 0) 70%),
+      radial-gradient(45% 35% at 50% 0%, #7a7c1d 0%, rgba(122, 124, 29, 0) 75%),
+      radial-gradient(60% 50% at 0% 50%, #2f5a13 0%, rgba(47, 90, 19, 0) 70%),
+      linear-gradient(180deg, #4b6519 0%, #4a6a1a 45%, #1d3112 100%);
+    background-attachment: fixed;
   }
 
-  /* Latar belakang samar, meniru daftar yang terkunci */
-  .backdrop {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    padding: 24px 16px; filter: blur(3px); opacity: .55;
-  }
-  .backdrop .row {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 14px 16px; margin: 0 auto 12px; max-width: 640px;
-  }
-  .backdrop .bar { height: 10px; border-radius: 5px; background: var(--line); margin: 8px 0; }
-  .backdrop .bar.short { width: 45%; }
-
-  .wrap {
-    position: relative; z-index: 1;
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 40px 16px; gap: 16px;
-  }
-
-  .card {
-    width: 100%; max-width: 420px;
-    background: var(--card); border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(15, 45, 85, .18);
+  /* ===== Layar aplikasi (putih, sudut tajam seperti referensi) ===== */
+  .screen {
+    max-width: 430px; min-height: 100vh; margin: 0 auto;
+    background: var(--paper);
+    padding: 12px 20px 32px;
     overflow: hidden;
   }
-
-  .brand {
-    display: flex; justify-content: center; align-items: center;
-    padding: 18px 24px;
-    background: #0f1d2e;
-  }
-  .brand img { display: block; height: 36px; width: auto; max-width: 100%; }
-
-  .body { padding: 22px 24px 0; }
-  .inner { padding-bottom: 24px; }
-
-  h1 { font-size: 22px; line-height: 1.3; margin: 0 0 8px; font-weight: 800; }
-  .lead { margin: 0 0 18px; color: var(--muted); font-size: 15px; line-height: 1.55; }
-
-  /* ===== Panggung carousel (meniru referensi) ===== */
-  .stage {
-    position: relative; overflow: hidden;
-    background:
-      radial-gradient(90% 60% at 30% 15%, rgba(190, 210, 90, .55), transparent 70%),
-      radial-gradient(120% 90% at 50% 100%, #2c4a12 0%, transparent 70%),
-      linear-gradient(170deg, #7d9a2c 0%, #4f6e1d 55%, #2a4310 100%);
-    padding: 26px 0 18px;
-  }
-  .picker {
-    display: flex; align-items: center; gap: 12px;
-    overflow-x: auto; scroll-snap-type: x mandatory;
-    padding: 4px 0 8px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .picker::-webkit-scrollbar { display: none; }
-  .picker::before, .picker::after { content: ""; flex: 0 0 19%; }
-
-  button.item {
-    flex: 0 0 62%; scroll-snap-align: center;
-    background: none; border: 0; padding: 0; margin: 0;
-    font: inherit; color: inherit; text-align: left; cursor: pointer;
-    transform: scale(.88); opacity: .72;
-    transition: transform .25s ease, opacity .25s ease;
-  }
-  button.item.active { transform: scale(1); opacity: 1; }
-
-  /* Kartu ala layar HP */
-  .phone {
-    background: #ffffff; border-radius: 22px; overflow: hidden;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, .28);
-    padding: 12px 12px 14px;
-    display: flex; flex-direction: column; gap: 10px;
-    height: 430px;
-    transition: border-color .25s, box-shadow .25s;
-    border: 6px solid transparent;
-  }
-  button.item.active .phone {
-    border: 7px solid #111;
-    border-radius: 30px;
-    box-shadow: 0 18px 36px rgba(0, 0, 0, .35);
+  @media (min-width: 600px) {
+    .screen { min-height: 0; margin: 48px auto; box-shadow: 0 30px 70px rgba(0, 0, 0, .35); }
   }
 
-  .hdr {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 11px; font-weight: 700; color: #111;
+  /* Header */
+  .hdr { display: flex; align-items: center; justify-content: space-between; height: 48px; }
+  .hdr svg { display: block; }
+  .logo { display: block; height: 24px; width: auto; }
+  .bag { position: relative; width: 24px; height: 24px; }
+  .badge {
+    position: absolute; left: -10px; bottom: -5px;
+    min-width: 19px; height: 19px; padding: 0 5px; border-radius: 10px;
+    background: #000; color: #fff; font-size: 10px; font-weight: 600;
+    line-height: 19px; text-align: center;
   }
-  .burger { display: inline-block; width: 14px; height: 10px; border-top: 2px solid #111; border-bottom: 2px solid #111; position: relative; }
-  .burger::after { content: ""; position: absolute; left: 0; right: 0; top: 2px; border-top: 2px solid #111; }
-  .hdr .bname { font-size: 12px; letter-spacing: .02em; }
-  .hdr .bag { width: 16px; height: 16px; border: 2px solid #111; border-radius: 3px; position: relative; }
 
+  /* Judul besar */
   .big {
-    font-size: 26px; font-weight: 500; line-height: 1.05; margin: 2px 0 0; color: #111; letter-spacing: -.01em;
+    margin: 22px 0 0;
+    font-weight: 400; font-size: clamp(44px, 15vw, 64px);
+    line-height: 1; letter-spacing: -.04em; color: #000;
   }
-  .tabs { display: flex; gap: 10px; font-size: 10px; color: #777; white-space: nowrap; }
-  .tabs .on { color: #111; font-weight: 700; }
 
-  .prod {
-    flex: 1; min-height: 0; border-radius: 12px; overflow: hidden;
-    background: linear-gradient(165deg, var(--c1), var(--c2));
-    display: flex; align-items: center; justify-content: center;
+  /* Tab kategori */
+  .tabs { display: flex; gap: 22px; margin-top: 22px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    background: none; border: 0; padding: 4px 0; margin: 0;
+    font: inherit; font-size: 15px; color: #111; cursor: pointer; white-space: nowrap;
+  }
+  .tab[aria-pressed="true"] { font-weight: 600; color: #000; }
+
+  /* ===== Carousel ebook di dalam layar ===== */
+  .carousel { margin: 8px -20px 0; }
+  .track {
     position: relative;
+    display: flex; overflow-x: auto;
+    scroll-snap-type: x mandatory; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
   }
-  .prod img { width: 100%; height: 100%; object-fit: contain; display: block; background: #fff; }
-  .prod .fallback {
-    color: #fff; font-size: 18px; font-weight: 800; line-height: 1.2;
-    text-align: center; padding: 14px; text-shadow: 0 2px 10px rgba(0,0,0,.2);
-  }
+  .track::-webkit-scrollbar { display: none; }
+  .track::before, .track::after { content: ""; flex: 0 0 27%; }
 
-  .pname { text-align: center; font-size: 14px; font-weight: 800; color: #111; line-height: 1.2; }
-  .psub { text-align: center; font-size: 10px; color: #666; line-height: 1.35; margin-top: -4px; }
-
-  .pfoot { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #111; }
-  .pfoot b { font-size: 14px; }
-
-  .cta {
-    background: #000; color: #fff; text-align: center;
-    padding: 11px 0; border-radius: 8px; font-size: 13px; font-weight: 700;
-  }
-  button.item.active .cta { background: var(--ok); }
-
-  .dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
-  .dot { width: 7px; height: 7px; border-radius: 4px; background: rgba(255,255,255,.45); transition: all .2s; }
-  .dot.on { width: 18px; background: #fff; }
-
-  /* ===== Form ===== */
-  .form-wrap { padding: 20px 24px 0; }
-  form { display: grid; gap: 12px; }
-  input {
-    width: 100%; height: 50px; padding: 0 16px;
-    border: 1px solid var(--line); border-radius: 12px;
-    background: var(--field); color: var(--text);
-    font: inherit; font-size: 15px; outline: none;
-  }
-  input::placeholder { color: var(--muted); }
-  input:focus { border-color: var(--blue1); box-shadow: 0 0 0 3px rgba(42, 123, 208, .18); }
-  input.invalid { border-color: var(--err); }
-
-  button.submit, .btn {
+  .item {
+    flex: 0 0 46%; height: min(80vw, 340px);
+    scroll-snap-align: center;
     display: flex; align-items: center; justify-content: center;
-    width: 100%; height: 52px; margin-top: 6px;
-    border: 0; border-radius: 12px; cursor: pointer;
-    background: linear-gradient(180deg, var(--blue1), var(--blue2));
-    color: #fff; font: inherit; font-size: 16px; font-weight: 700;
-    text-decoration: none; box-shadow: 0 8px 18px rgba(21, 87, 154, .3);
+    background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
-  button.submit:disabled { opacity: .6; cursor: default; }
-
-  .pick-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 12px; margin-bottom: 14px;
-    border: 1px solid var(--line); border-radius: 14px; background: #f5f8fc;
+  .item > * { transform: scale(.72); }
+  .item.active > * { transform: scale(1); }
+  .track.anim .item > * { transition: transform .35s ease; }
+  .item img {
+    display: block; height: 92%; width: auto; max-width: 100%;
+    object-fit: contain; pointer-events: none; user-select: none;
   }
-  .thumb {
-    flex: 0 0 auto; width: 44px; height: 58px; border-radius: 6px; overflow: hidden;
-    background: linear-gradient(160deg, var(--c1, #2a7bd0), var(--c2, #15579a));
+
+  /* Cover cadangan berbentuk buku (dipakai jika gambar cover belum ada) */
+  .book {
+    position: relative; display: block;
+    height: 84%; aspect-ratio: .68;
+    border-radius: 3px 7px 7px 3px;
+    background: linear-gradient(160deg, var(--c1), var(--c2));
+    color: #fff; text-align: left;
+    padding: 22% 12% 0 16%;
+    box-shadow: inset 7px 0 10px -4px rgba(0, 0, 0, .35), 10px 14px 22px rgba(0, 0, 0, .18);
   }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .pick-row small { display: block; font-size: 12px; color: var(--muted); }
-  .pick-row strong { display: block; font-size: 14px; line-height: 1.35; margin-top: 2px; }
-
-  .note { margin: 14px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
-  .msg { min-height: 18px; margin: 0; font-size: 13.5px; color: var(--err); }
-
-  .unlocked { display: none; text-align: center; }
-  .unlocked .tick {
-    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
-    display: grid; place-items: center; background: var(--ok); color: #fff; font-size: 28px;
+  .book::after {
+    content: ""; position: absolute; top: 3px; bottom: 3px; right: -5px; width: 5px;
+    border-radius: 0 3px 3px 0;
+    background: repeating-linear-gradient(180deg, #f4f4f4 0 2px, #dcdcdc 2px 3px);
   }
-  .unlocked p { color: var(--muted); font-size: 15px; line-height: 1.55; margin: 0 0 18px; }
+  .book .bk {
+    display: block; margin-bottom: 10px;
+    font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; opacity: .8;
+  }
+  .book .bt { display: block; font-size: 18px; font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
 
-  body.is-open .form-part { display: none; }
-  body.is-open .unlocked { display: block; }
+  /* Info produk */
+  .info { text-align: center; margin-top: 4px; }
+  .pname { margin: 0; font-size: 25px; font-weight: 400; line-height: 1.15; letter-spacing: -.015em; color: #000; }
+  .psub { margin: 6px 0 0; font-size: 14px; color: #111; }
+  .pmeta { margin: 8px 0 0; font-size: 13px; color: var(--grey); }
+
+  /* Baris "harga" + stepper */
+  .row { display: flex; align-items: center; justify-content: space-between; margin-top: 22px; }
+  .price { font-size: 28px; font-weight: 400; letter-spacing: -.02em; color: #000; }
+  .stepper { display: flex; align-items: center; gap: 12px; }
+  .step {
+    width: 34px; height: 34px; border-radius: 50%; border: 0; padding: 0;
+    background: var(--chip); color: #111; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .step:disabled { opacity: .4; cursor: default; }
+  .count { min-width: 36px; text-align: center; font-size: 20px; color: #000; }
+
+  /* ===== Form kunci ===== */
+  .lock { margin-top: 22px; }
+  .lock-label { margin: 0 0 10px; font-size: 13px; color: var(--grey); }
+  .lock form { display: grid; gap: 10px; }
+  .field {
+    width: 100%; height: 50px; padding: 0 14px;
+    border: 1px solid var(--line); border-radius: 0;
+    background: #fff; color: #000;
+    font: inherit; font-size: 15px; outline: none;
+    -webkit-appearance: none; appearance: none;
+  }
+  .field::placeholder { color: #9a9a9a; }
+  .field:focus { border-color: #000; }
+  .field.invalid { border-color: var(--err); }
+  .msg { margin: 0; min-height: 18px; font-size: 13px; color: var(--err); }
+
+  .buy {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 56px; margin: 0;
+    border: 0; border-radius: 0;
+    background: var(--ink); color: #fff;
+    font: inherit; font-size: 17px; font-weight: 400;
+    text-decoration: none; cursor: pointer;
+  }
+  .buy:disabled { opacity: .6; cursor: default; }
+  .note { margin: 14px 0 0; font-size: 12px; line-height: 1.5; color: var(--grey); text-align: center; }
+
+  .done { display: none; margin-top: 22px; }
+  .ok { margin: 0 0 12px; font-size: 14px; color: #000; text-align: center; }
+  body.is-open .lock { display: none; }
+  body.is-open .done { display: block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .track.anim .item > * { transition: none; }
+  }
 </style>
 </head>
 <body>
 
-<div class="backdrop" aria-hidden="true">
-  <div class="row"><div class="bar"></div><div class="bar short"></div></div>
-  <div class="row"><div class="bar"></div><div class="bar short"></div></div>
-  <div class="row"><div class="bar"></div><div class="bar short"></div></div>
-</div>
+<main class="screen">
+  <header class="hdr">
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 6h12M3 12h18M3 18h9" stroke="#000" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    </svg>
+    <img class="logo" src="logo-riviera-hitam.png" alt="Riviera Publishing">
+    <span class="bag" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <path d="M5 8h14l-1 13H6L5 8z" stroke="#000" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="#000" stroke-width="1.6" fill="none"/>
+      </svg>
+      <span class="badge" id="badge">3</span>
+    </span>
+  </header>
 
-<main class="wrap">
-  <section class="card">
-    <div class="brand">
-      <img src="logo-riviera.png" alt="Riviera Publishing" height="36">
-    </div>
+  <h1 class="big">Ebook Gratis</h1>
 
-    <div class="inner">
+  <nav class="tabs" id="tabs" aria-label="Kategori ebook"></nav>
 
-      <div class="form-part">
-        <div class="body">
-          <h1>Buka kunci ebook prompt</h1>
-          <p class="lead">Pilih ebook, isi data singkat, lalu link akan terbuka. Gratis.</p>
-        </div>
-
-        <div class="stage">
-          <div class="picker" id="picker" aria-label="Pilih ebook"></div>
-          <div class="dots" id="dots" aria-hidden="true"></div>
-        </div>
-
-        <div class="form-wrap">
-          <div class="pick-row">
-            <div class="thumb" id="thumb"></div>
-            <div>
-              <small>Ebook yang dipilih</small>
-              <strong id="pickTitle"></strong>
-            </div>
-          </div>
-          <form id="unlockForm" novalidate>
-            <input id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
-            <input id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
-            <input id="inst" name="inst" type="text" placeholder="Instansi atau kampus" autocomplete="organization" required>
-            <p class="msg" id="msg" role="alert"></p>
-            <button type="submit" class="submit" id="submitBtn">Buka ebook</button>
-          </form>
-
-          <p class="note">
-            Gratis. Data Anda hanya dipakai Riviera Publishing untuk mengirim hasil dan menindaklanjutinya lewat WhatsApp.
-            Dengan menekan tombol, Anda menyetujuinya.
-          </p>
-        </div>
-      </div>
-
-      <div class="unlocked body" id="unlocked">
-        <div class="tick">&#10003;</div>
-        <h1>Ebook sudah terbuka</h1>
-        <p id="unlockedTitle"></p>
-        <a class="btn" id="ebookLink" href="#" target="_blank" rel="noopener">Klaim ebook</a>
-      </div>
-
-    </div>
+  <section class="carousel" aria-label="Pilih ebook, geser ke kiri atau kanan">
+    <div class="track" id="track"></div>
   </section>
+
+  <div class="info" aria-live="polite">
+    <h2 class="pname" id="pname"></h2>
+    <p class="psub" id="psub"></p>
+    <p class="pmeta" id="pmeta"></p>
+  </div>
+
+  <div class="row">
+    <span class="price">Gratis</span>
+    <div class="stepper">
+      <button type="button" class="step" id="prev" aria-label="Ebook sebelumnya">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2L4 7l5 5" stroke="#111" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="count" id="count">1/3</span>
+      <button type="button" class="step" id="next" aria-label="Ebook berikutnya">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2l5 5-5 5" stroke="#111" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="lock" id="lock">
+    <p class="lock-label">Isi data untuk membuka ebook</p>
+    <form id="unlockForm" novalidate>
+      <input class="field" id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
+      <input class="field" id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
+      <input class="field" id="inst" name="inst" type="text" placeholder="Instansi atau kampus" autocomplete="organization" required>
+      <p class="msg" id="msg" role="alert"></p>
+      <button type="submit" class="buy" id="submitBtn">Buka ebook</button>
+    </form>
+    <p class="note">Gratis. Data Anda hanya dipakai Riviera Publishing untuk mengirim hasil dan menindaklanjutinya lewat WhatsApp. Dengan menekan tombol, Anda menyetujuinya.</p>
+  </div>
+
+  <div class="done" id="done">
+    <p class="ok">&#10003; Ebook sudah terbuka</p>
+    <a class="buy" id="openLink" href="#" target="_blank" rel="noopener">Buka di Google Drive</a>
+    <p class="note">Geser untuk memilih ebook lain, lalu tekan tombol di atas.</p>
+  </div>
 </main>
 
 <script>
   /* ===== KONFIGURASI ===== */
-  // Daftar ebook yang bisa dipilih di carousel. Tambah/ubah item di sini.
+  // Daftar ebook. "cover" opsional: jika kosong, tampil cover buku cadangan.
+  // Ebook di posisi tengah daftar tampil pertama kali (kiri-kanannya mengintip).
   const EBOOKS = [
     {
-      title: "Prompt Artikel",
-      subtitle: "Prompt Bab I–V untuk menyusun artikel jurnal",
-      tag: "Ebook Prompt",
-      link: "https://drive.google.com/file/d/1m43D_3zPtBYRAgl4Zm2bQovebnwCdIAk/view?usp=sharing",
-      colors: ["#2a7bd0", "#15579a"],
+      title: "Skripsi ke Artikel Jurnal",
+      subtitle: "Prompt konversi ke format IMRaD",
+      meta: "DOCX · Prompt",
+      cat: "prompt",
+      link: "https://drive.google.com/file/d/1ev5nOLsVlx0io2tQQyX4Eydt4TtC2bOj/view?usp=sharing",
+      colors: ["#1f9d6b", "#0f5e40"],
     },
     {
-      title: "Skripsi & Tesis ke Artikel",
-      subtitle: "Ubah skripsi atau tesis menjadi naskah jurnal",
-      tag: "Ebook Prompt",
-      cover: "cover-tesis.png",
-      link: "https://drive.google.com/file/d/1ev5nOLsVlx0io2tQQyX4Eydt4TtC2bOj/view?usp=sharing",
-      colors: ["#1f9d6b", "#0f6b4a"],
+      title: "Prompt Tesis/Skripsi",
+      subtitle: "Kumpulan prompt Bab I–V",
+      meta: "PDF · Prompt",
+      cat: "prompt",
+      cover: "cover-tesis.webp",
+      link: "https://drive.google.com/file/d/1m43D_3zPtBYRAgl4Zm2bQovebnwCdIAk/view?usp=sharing",
+      colors: ["#1f4f9a", "#0f2d63"],
     },
     {
       title: "From Zero to Publish",
-      subtitle: "Panduan dari nol sampai naskah terbit",
-      tag: "Panduan",
+      subtitle: "Panduan dari nol sampai terbit",
+      meta: "PDF · Panduan",
+      cat: "panduan",
       link: "https://drive.google.com/file/d/1syij8LL2aip4wmb7XfowlHVOnQQ0ZNd9/view?usp=sharing",
-      colors: ["#7a4fd6", "#4a2a9c"],
+      colors: ["#6b46c1", "#3b2585"],
     },
+  ];
+
+  const TABS = [
+    { key: "all", label: "Semua" },
+    { key: "prompt", label: "Prompt" },
+    { key: "panduan", label: "Panduan" },
   ];
 
   // URL Web App Google Apps Script untuk menyimpan data peserta. Kosongkan jika belum dipasang.
@@ -305,122 +281,129 @@
   /* ======================= */
 
   const $ = (id) => document.getElementById(id);
-  const form = $("unlockForm");
-  const msg = $("msg");
-  const btn = $("submitBtn");
-  const nameEl = $("name");
-  const waEl = $("wa");
-  const instEl = $("inst");
-  const picker = $("picker");
-  const dotsEl = $("dots");
-  const thumbEl = $("thumb");
-  const pickTitleEl = $("pickTitle");
+  const track = $("track");
+  const tabsEl = $("tabs");
+  const pname = $("pname"), psub = $("psub"), pmeta = $("pmeta");
+  const countEl = $("count"), prevBtn = $("prev"), nextBtn = $("next");
+  const openLink = $("openLink");
+  const form = $("unlockForm"), msg = $("msg"), btn = $("submitBtn");
+  const nameEl = $("name"), waEl = $("wa"), instEl = $("inst");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let selected = 0;
+  let tab = "all";
+  let list = EBOOKS.slice();
+  let active = 0;
+
+  $("badge").textContent = EBOOKS.length;
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-  function renderPicker() {
-    picker.innerHTML = EBOOKS.map((b, i) => `
-      <button type="button" class="item" data-i="${i}" aria-label="${esc(b.title)}"
-        style="--c1:${b.colors[0]};--c2:${b.colors[1]}">
-        <div class="phone">
-          <div class="hdr">
-            <span class="burger"></span>
-            <span class="bname">RIVIERA</span>
-            <span class="bag"></span>
-          </div>
-          <div class="big">${esc(b.tag)}</div>
-          <div class="tabs"><span class="on">Ebook</span><span>Prompt</span><span>Panduan</span></div>
-          <div class="prod">
-            ${b.cover
-              ? `<img src="${esc(b.cover)}" alt="${esc(b.title)}" loading="lazy">`
-              : `<div class="fallback">${esc(b.title)}</div>`}
-          </div>
-          <div class="pname">${esc(b.title)}</div>
-          <div class="psub">${esc(b.subtitle)}</div>
-          <div class="pfoot"><b>Gratis</b><span>1 eBook</span></div>
-          <div class="cta">Pilih</div>
-        </div>
-      </button>`).join("");
-    dotsEl.innerHTML = EBOOKS.map(() => '<span class="dot"></span>').join("");
+  function renderTabs() {
+    tabsEl.innerHTML = TABS.map((t) =>
+      `<button type="button" class="tab" data-k="${t.key}" aria-pressed="${t.key === tab}">${esc(t.label)}</button>`
+    ).join("");
   }
 
-  function select(i, scroll) {
-    selected = i;
-    const items = picker.querySelectorAll(".item");
-    items.forEach((el, idx) => {
-      const on = idx === i;
-      el.classList.toggle("active", on);
-      el.querySelector(".cta").textContent = on ? "Dipilih ✓" : "Pilih";
+  function renderTrack() {
+    track.innerHTML = list.map((b, i) => {
+      const visual = b.cover
+        ? `<img src="${esc(b.cover)}" alt="" draggable="false">`
+        : `<span class="book" style="--c1:${b.colors[0]};--c2:${b.colors[1]}">
+             <span class="bk">${esc(b.meta.split(" · ")[1] || "Ebook")}</span>
+             <span class="bt">${esc(b.title)}</span>
+           </span>`;
+      return `<button type="button" class="item" data-i="${i}" aria-label="${esc(b.title)}">${visual}</button>`;
+    }).join("");
+    // Mulai dari item tengah tanpa animasi, lalu aktifkan animasi
+    track.classList.remove("anim");
+    const start = Math.floor(list.length / 2);
+    const el = track.querySelectorAll(".item")[start];
+    track.scrollLeft = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
+    setActive(start);
+    requestAnimationFrame(() => requestAnimationFrame(() => track.classList.add("anim")));
+  }
+
+  function setActive(i) {
+    active = i;
+    track.querySelectorAll(".item").forEach((el, idx) => {
+      el.classList.toggle("active", idx === i);
+      el.setAttribute("aria-current", idx === i ? "true" : "false");
     });
-    dotsEl.querySelectorAll(".dot").forEach((el, idx) => el.classList.toggle("on", idx === i));
-    const b = EBOOKS[i];
-    pickTitleEl.textContent = b.title;
-    thumbEl.innerHTML = b.cover ? `<img src="${esc(b.cover)}" alt="">` : "";
-    thumbEl.style.setProperty("--c1", b.colors[0]);
-    thumbEl.style.setProperty("--c2", b.colors[1]);
-    if (scroll && items[i]) {
-      items[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-    }
+    const b = list[i];
+    pname.textContent = b.title;
+    psub.textContent = b.subtitle;
+    pmeta.textContent = b.meta;
+    countEl.textContent = `${i + 1}/${list.length}`;
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === list.length - 1;
+    openLink.href = b.link;
   }
 
-  // Saat carousel digeser, pilih item yang paling dekat ke tengah
-  let scrollTimer = null;
-  picker.addEventListener("scroll", () => {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => {
-      const center = picker.getBoundingClientRect().left + picker.clientWidth / 2;
-      let best = selected, bestDist = Infinity;
-      picker.querySelectorAll(".item").forEach((el, idx) => {
-        const r = el.getBoundingClientRect();
-        const dist = Math.abs(r.left + r.width / 2 - center);
-        if (dist < bestDist) { bestDist = dist; best = idx; }
+  function go(i) {
+    const el = track.querySelectorAll(".item")[i];
+    if (!el) return;
+    const left = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
+    track.scrollTo({ left, behavior: reduceMotion ? "auto" : "smooth" });
+    setActive(i);
+  }
+
+  // Item yang paling dekat ke tengah menjadi aktif saat digeser
+  let ticking = false;
+  track.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const center = track.scrollLeft + track.clientWidth / 2;
+      let best = active, bestDist = Infinity;
+      track.querySelectorAll(".item").forEach((el, idx) => {
+        const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - center);
+        if (d < bestDist) { bestDist = d; best = idx; }
       });
-      if (best !== selected) select(best, false);
-    }, 80);
+      if (best !== active) setActive(best);
+    });
   }, { passive: true });
 
-  picker.addEventListener("click", (e) => {
+  track.addEventListener("click", (e) => {
     const item = e.target.closest(".item");
-    if (!item) return;
-    select(Number(item.dataset.i), true);
+    if (item) go(Number(item.dataset.i));
+  });
+  prevBtn.addEventListener("click", () => go(active - 1));
+  nextBtn.addEventListener("click", () => go(active + 1));
+
+  tabsEl.addEventListener("click", (e) => {
+    const t = e.target.closest(".tab");
+    if (!t || t.dataset.k === tab) return;
+    tab = t.dataset.k;
+    list = tab === "all" ? EBOOKS.slice() : EBOOKS.filter((b) => b.cat === tab);
+    renderTabs();
+    renderTrack();
   });
 
-  renderPicker();
-  select(0, false);
+  renderTabs();
+  renderTrack();
 
+  /* ===== Form ===== */
   function normalizeWA(raw) {
     let d = (raw || "").replace(/\D/g, "");
     if (d.startsWith("0")) d = "62" + d.slice(1);
     return d;
   }
 
-  function setInvalid(el, bad) {
-    el.classList.toggle("invalid", bad);
-  }
-
   function validate() {
     const name = nameEl.value.trim();
     const wa = normalizeWA(waEl.value);
     const inst = instEl.value.trim();
-    setInvalid(nameEl, name.length < 2);
-    setInvalid(waEl, wa.length < 9 || wa.length > 15);
-    setInvalid(instEl, inst.length < 2);
-    if (name.length < 2) return "Nama lengkap wajib diisi.";
-    if (wa.length < 9 || wa.length > 15) return "Nomor WhatsApp belum valid.";
-    if (inst.length < 2) return "Instansi atau kampus wajib diisi.";
+    const badName = name.length < 2, badWa = wa.length < 9 || wa.length > 15, badInst = inst.length < 2;
+    nameEl.classList.toggle("invalid", badName);
+    waEl.classList.toggle("invalid", badWa);
+    instEl.classList.toggle("invalid", badInst);
+    if (badName) return "Nama lengkap wajib diisi.";
+    if (badWa) return "Nomor WhatsApp belum valid.";
+    if (badInst) return "Instansi atau kampus wajib diisi.";
     return null;
-  }
-
-  function unlock() {
-    const book = EBOOKS[selected];
-    $("ebookLink").href = book.link;
-    $("unlockedTitle").textContent = book.title;
-    document.body.classList.add("is-open");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   form.addEventListener("submit", async (e) => {
@@ -433,7 +416,7 @@
       nama: nameEl.value.trim(),
       whatsapp: normalizeWA(waEl.value),
       instansi: instEl.value.trim(),
-      ebook: EBOOKS[selected].title,
+      ebook: list[active].title,
       waktu: new Date().toISOString(),
     };
 
@@ -452,7 +435,7 @@
       } else {
         console.warn("[Ebook] FORM_ENDPOINT belum diisi. Data tidak tersimpan.", payload);
       }
-      unlock();
+      document.body.classList.add("is-open");
     } catch (err) {
       console.error("[Ebook] gagal kirim:", err);
       msg.textContent = "Koneksi bermasalah. Coba lagi sebentar.";
