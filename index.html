@@ -114,6 +114,9 @@
     content: ""; position: absolute; width: 120px; height: 120px; left: -50px; bottom: -40px;
     border-radius: 50%; background: rgba(0,0,0,.12);
   }
+  .cover.cover-img { padding: 14px; background: #ffffff; justify-content: center; align-items: center; }
+  .cover.cover-img::before, .cover.cover-img::after { display: none; }
+  .cover.cover-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
   .tag {
     position: relative; z-index: 1; align-self: flex-start;
     font-size: 11px; font-weight: 700; letter-spacing: .02em;
@@ -165,6 +168,19 @@
   }
   button.submit:disabled { opacity: .6; cursor: default; }
 
+  .pick-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; margin-bottom: 14px;
+    border: 1px solid var(--line); border-radius: 14px; background: #f5f8fc;
+  }
+  .thumb {
+    flex: 0 0 auto; width: 44px; height: 58px; border-radius: 6px; overflow: hidden;
+    background: linear-gradient(160deg, var(--c1, #2a7bd0), var(--c2, #15579a));
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pick-row small { display: block; font-size: 12px; color: var(--muted); }
+  .pick-row strong { display: block; font-size: 14px; line-height: 1.35; margin-top: 2px; }
+
   .note { margin: 14px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
   .msg { min-height: 18px; margin: 0; font-size: 13.5px; color: var(--err); }
 
@@ -207,6 +223,13 @@
         </div>
 
         <div class="form-wrap">
+          <div class="pick-row">
+            <div class="thumb" id="thumb"></div>
+            <div>
+              <small>Ebook yang dipilih</small>
+              <strong id="pickTitle"></strong>
+            </div>
+          </div>
           <form id="unlockForm" novalidate>
             <input id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
             <input id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
@@ -248,6 +271,7 @@
       title: "Skripsi & Tesis ke Artikel",
       subtitle: "Ubah skripsi atau tesis menjadi naskah jurnal",
       tag: "Prompt",
+      cover: "cover-tesis.png",
       link: "https://drive.google.com/file/d/1ev5nOLsVlx0io2tQQyX4Eydt4TtC2bOj/view?usp=sharing",
       colors: ["#1f9d6b", "#0f6b4a"],
     },
@@ -273,6 +297,8 @@
   const instEl = $("inst");
   const picker = $("picker");
   const dotsEl = $("dots");
+  const thumbEl = $("thumb");
+  const pickTitleEl = $("pickTitle");
 
   let selected = 0;
 
@@ -284,10 +310,12 @@
     picker.innerHTML = EBOOKS.map((b, i) => `
       <button type="button" class="item" data-i="${i}" aria-label="${esc(b.title)}"
         style="--c1:${b.colors[0]};--c2:${b.colors[1]}">
-        <div class="cover">
+        ${b.cover
+          ? `<div class="cover cover-img"><img src="${esc(b.cover)}" alt="${esc(b.title)}" loading="lazy"></div>`
+          : `<div class="cover">
           <span class="tag">${esc(b.tag)}</span>
           <span class="title">${esc(b.title)}</span>
-        </div>
+        </div>`}
         <div class="foot">
           <span class="sub">${esc(b.subtitle)}</span>
           <span class="chip">Pilih</span>
@@ -305,6 +333,11 @@
       el.querySelector(".chip").textContent = on ? "Dipilih ✓" : "Pilih";
     });
     dotsEl.querySelectorAll(".dot").forEach((el, idx) => el.classList.toggle("on", idx === i));
+    const b = EBOOKS[i];
+    pickTitleEl.textContent = b.title;
+    thumbEl.innerHTML = b.cover ? `<img src="${esc(b.cover)}" alt="">` : "";
+    thumbEl.style.setProperty("--c1", b.colors[0]);
+    thumbEl.style.setProperty("--c2", b.colors[1]);
     if (scroll && items[i]) {
       items[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     }
