@@ -132,7 +132,6 @@
     font-size: 14px; line-height: 1.4; color: #000;
   }
   .desc-list li span { flex: none; min-width: 20px; color: var(--grey); font-variant-numeric: tabular-nums; }
-  .choose { margin-top: 22px; }
 
   /* ===== Form kunci (muncul setelah tombol "Pilih ebook ini" ditekan) ===== */
   .lock { display: none; margin-top: 22px; }
@@ -165,6 +164,7 @@
     text-decoration: none; cursor: pointer;
   }
   .buy:disabled { opacity: .6; cursor: default; }
+  .choose { margin-top: 22px; }
   .note { margin: 14px 0 0; font-size: 12px; line-height: 1.5; color: var(--grey); text-align: center; }
 
   .done { display: none; margin-top: 22px; }
@@ -382,6 +382,7 @@
   const track = $("track");
   const pname = $("pname"), psub = $("psub"), pmeta = $("pmeta");
   const pdesc = $("pdesc"), ppoints = $("ppoints");
+  const infoBox = document.querySelector(".info"), descBox = $("desc");
   const chooseBtn = $("chooseBtn"), backBtn = $("backBtn");
   const countEl = $("count"), prevBtn = $("prev"), nextBtn = $("next");
   const openLink = $("openLink");
@@ -415,17 +416,11 @@
     if (start < 0) start = Math.floor(list.length / 2);
     const el = track.querySelectorAll(".item")[start];
     track.scrollLeft = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
-    setActive(start);
+    setActive(start, false);
     requestAnimationFrame(() => requestAnimationFrame(() => track.classList.add("anim")));
   }
 
-  function setActive(i) {
-    active = i;
-    track.querySelectorAll(".item").forEach((el, idx) => {
-      el.classList.toggle("active", idx === i);
-      el.setAttribute("aria-current", idx === i ? "true" : "false");
-    });
-    const b = list[i];
+  function fillText(b) {
     pname.textContent = b.title;
     psub.textContent = b.subtitle;
     pmeta.textContent = b.meta;
@@ -433,15 +428,54 @@
     ppoints.innerHTML = (b.points || []).map((p, n) =>
       `<li><span>${String(n + 1).padStart(2, "0")}</span>${esc(p)}</li>`
     ).join("");
+  }
+
+  function setActive(i, animate = true) {
+    const changed = i !== active;
+    active = i;
+    track.querySelectorAll(".item").forEach((el, idx) => {
+      el.classList.toggle("active", idx === i);
+      el.setAttribute("aria-current", idx === i ? "true" : "false");
+    });
+    const b = list[i];
+    fillText(b);
     countEl.textContent = `${i + 1}/${list.length}`;
     prevBtn.disabled = i === 0;
     nextBtn.disabled = i === list.length - 1;
     openLink.href = b.link;
+    // Teks baru muncul halus (fade + naik sedikit)
+    if (changed && animate && !reduceMotion && infoBox.animate) {
+      const fade = [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }];
+      [infoBox, descBox].forEach((el) => el.animate(fade, { duration: 320, easing: "cubic-bezier(.2,.7,.2,1)" }));
+    }
   }
 
+  // Kunci tinggi blok judul & deskripsi setinggi ebook terpanjang,
+  // supaya teks dan tombol tidak loncat naik-turun saat ganti ebook.
+  function lockHeights() {
+    const descShown = getComputedStyle(descBox).display !== "none";
+    infoBox.style.minHeight = "";
+    if (descShown) descBox.style.minHeight = "";
+    let hi = 0, hd = 0;
+    list.forEach((b) => {
+      fillText(b);
+      hi = Math.max(hi, infoBox.offsetHeight);
+      if (descShown) hd = Math.max(hd, descBox.offsetHeight);
+    });
+    fillText(list[active]);
+    infoBox.style.minHeight = hi + "px";
+    if (descShown) descBox.style.minHeight = hd + "px";
+  }
+
+  // Saat tombol panah / klik ebook menggeser carousel, abaikan posisi antara
+  // (agar judul tidak berganti bolak-balik) sampai ebook tujuan tiba di tengah.
+  let pending = null, pendingTimer = 0;
   function go(i) {
     const el = track.querySelectorAll(".item")[i];
     if (!el) return;
+    pending = i;
+    clearTimeout(pendingTimer);
+    pendingTimer = setTimeout(() => { pending = null; }, 1000);
     const left = el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2;
     track.scrollTo({ left, behavior: reduceMotion ? "auto" : "smooth" });
     setActive(i);
@@ -460,9 +494,17 @@
         const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - center);
         if (d < bestDist) { bestDist = d; best = idx; }
       });
+      if (pending !== null) {
+        if (best === pending) { pending = null; clearTimeout(pendingTimer); }
+        return;
+      }
       if (best !== active) setActive(best);
     });
   }, { passive: true });
+  // Jika pengguna menyentuh/menggeser sendiri, kembali ikuti posisi geser
+  ["pointerdown", "touchstart"].forEach((ev) =>
+    track.addEventListener(ev, () => { pending = null; }, { passive: true })
+  );
 
   track.addEventListener("click", (e) => {
     const item = e.target.closest(".item");
@@ -472,6 +514,13 @@
   nextBtn.addEventListener("click", () => go(active + 1));
 
   renderTrack(new URLSearchParams(location.search).get("ebook"));
+  lockHeights();
+  if (document.fonts) document.fonts.ready.then(lockHeights);
+  let resizeRaf = 0;
+  window.addEventListener("resize", () => {
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(lockHeights);
+  });
 
   // "Pilih ebook ini" → deskripsi diganti form isi data; "Kembali" → deskripsi lagi
   chooseBtn.addEventListener("click", () => {
@@ -482,6 +531,7 @@
     document.body.classList.remove("is-form");
     msg.textContent = "";
     [nameEl, waEl, instEl].forEach((el) => el.classList.remove("invalid"));
+    lockHeights();
     chooseBtn.focus();
   });
 
@@ -537,6 +587,7 @@
       }
       document.body.classList.remove("is-form");
       document.body.classList.add("is-open");
+      lockHeights();
     } catch (err) {
       console.error("[Ebook] gagal kirim:", err);
       msg.textContent = "Koneksi bermasalah. Coba lagi sebentar.";
