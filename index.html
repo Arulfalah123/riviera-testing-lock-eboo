@@ -170,6 +170,32 @@
   body.is-open .lock { display: none; }
   body.is-open .done { display: block; }
 
+  /* ===== Laptop / desktop: layar melebar, dua kolom ===== */
+  @media (min-width: 900px) {
+    .screen { max-width: 1120px; margin: 40px auto; padding: 20px 56px 56px; }
+    .hdr { height: 60px; }
+    .logo { height: 30px; }
+    .big { margin-top: 28px; font-size: clamp(72px, 7.5vw, 104px); }
+
+    .layout {
+      display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 64px; align-items: center; margin-top: 8px;
+    }
+    .tabs { margin-top: 26px; }
+
+    /* Kotak pajangan: tepinya memotong ebook samping, seperti tepi layar HP */
+    .carousel { margin: 16px 0 0; background: #f2f2f0; padding: 28px 0; }
+    .track::before, .track::after { flex-basis: 24%; }
+    .item { flex-basis: 52%; height: 440px; }
+
+    .info { text-align: left; margin-top: 0; }
+    .pname { font-size: 40px; letter-spacing: -.025em; }
+    .psub { margin-top: 10px; font-size: 17px; }
+    .pmeta { font-size: 14px; }
+    .row { margin-top: 28px; }
+    .note, .ok { text-align: left; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .track.anim .item > * { transition: none; }
   }
@@ -194,12 +220,16 @@
 
   <h1 class="big">Ebook Gratis</h1>
 
+  <div class="layout">
+  <div class="col-media">
   <nav class="tabs" id="tabs" aria-label="Kategori ebook"></nav>
 
   <section class="carousel" aria-label="Pilih ebook, geser ke kiri atau kanan">
     <div class="track" id="track"></div>
   </section>
+  </div>
 
+  <div class="col-info">
   <div class="info" aria-live="polite">
     <h2 class="pname" id="pname"></h2>
     <p class="psub" id="psub"></p>
@@ -235,6 +265,8 @@
     <p class="ok">&#10003; Ebook sudah terbuka</p>
     <a class="buy" id="openLink" href="#" target="_blank" rel="noopener">Buka di Google Drive</a>
     <p class="note">Geser untuk memilih ebook lain, lalu tekan tombol di atas.</p>
+  </div>
+  </div>
   </div>
 </main>
 
