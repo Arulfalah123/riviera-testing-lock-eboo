@@ -55,17 +55,8 @@
     line-height: 1; letter-spacing: -.04em; color: #000;
   }
 
-  /* Tab kategori */
-  .tabs { display: flex; gap: 22px; margin-top: 22px; overflow-x: auto; scrollbar-width: none; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    background: none; border: 0; padding: 4px 0; margin: 0;
-    font: inherit; font-size: 15px; color: #111; cursor: pointer; white-space: nowrap;
-  }
-  .tab[aria-pressed="true"] { font-weight: 600; color: #000; }
-
   /* ===== Carousel ebook di dalam layar ===== */
-  .carousel { margin: 8px -20px 0; }
+  .carousel { margin: 16px -20px 0; }
   .track {
     position: relative;
     display: flex; overflow-x: auto;
@@ -129,9 +120,29 @@
   .step:disabled { opacity: .4; cursor: default; }
   .count { min-width: 36px; text-align: center; font-size: 20px; color: #000; }
 
-  /* ===== Form kunci ===== */
-  .lock { margin-top: 22px; }
-  .lock-label { margin: 0 0 10px; font-size: 13px; color: var(--grey); }
+  /* ===== Deskripsi ebook (tampil sebelum form) ===== */
+  .desc { margin-top: 22px; }
+  .desc-label { margin: 0 0 8px; font-size: 13px; color: var(--grey); }
+  .desc-text { margin: 0; font-size: 15px; line-height: 1.6; color: #111; }
+  .desc-list { list-style: none; margin: 16px 0 0; padding: 0; border-top: 1px solid var(--line); }
+  .desc-list:empty { display: none; }
+  .desc-list li {
+    display: flex; gap: 14px; padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px; line-height: 1.4; color: #000;
+  }
+  .desc-list li span { flex: none; min-width: 20px; color: var(--grey); font-variant-numeric: tabular-nums; }
+  .choose { margin-top: 22px; }
+
+  /* ===== Form kunci (muncul setelah tombol "Pilih ebook ini" ditekan) ===== */
+  .lock { display: none; margin-top: 22px; }
+  .lock-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .lock-label { margin: 0; font-size: 13px; color: var(--grey); }
+  .back {
+    background: none; border: 0; padding: 0; margin: 0;
+    font: inherit; font-size: 13px; color: #000; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
   .lock form { display: grid; gap: 10px; }
   .field {
     width: 100%; height: 50px; padding: 0 14px;
@@ -158,7 +169,10 @@
 
   .done { display: none; margin-top: 22px; }
   .ok { margin: 0 0 12px; font-size: 14px; color: #000; text-align: center; }
-  body.is-open .lock { display: none; }
+  /* Tahap: deskripsi → form → link Drive */
+  body.is-form .desc, body.is-form .choose { display: none; }
+  body.is-form .lock { display: block; }
+  body.is-open .choose, body.is-open .lock { display: none; }
   body.is-open .done { display: block; }
 
   /* Footer */
@@ -187,11 +201,8 @@
       gap: clamp(48px, 5vw, 120px); align-items: center;
       padding-top: 2vh;
     }
-    .tabs { margin-top: 0; gap: clamp(22px, 1.8vw, 36px); }
-    .tab { font-size: clamp(15px, 1.05vw, 20px); }
-
     /* Carousel menyatu dengan latar putih: ebook tengah + 2 ebook samping tampil utuh di dalam kolom */
-    .carousel { margin: 2vh 0 0; container-type: inline-size; }
+    .carousel { margin: 0; container-type: inline-size; }
     .track::before, .track::after { flex-basis: 30%; }
     .item { flex-basis: 40%; height: clamp(360px, 54vh, 760px); }
     @supports (width: 1cqw) {
@@ -206,13 +217,18 @@
     .pname { font-size: clamp(36px, 2.9vw, 62px); letter-spacing: -.025em; }
     .psub { margin-top: 1.2vh; font-size: clamp(16px, 1.15vw, 23px); }
     .pmeta { margin-top: 1vh; font-size: clamp(14px, .9vw, 18px); }
-    .row { margin-top: 3.5vh; }
+    .row { margin-top: 3vh; }
     .price { font-size: clamp(28px, 2.1vw, 44px); }
     .step { width: clamp(34px, 2.5vw, 50px); height: clamp(34px, 2.5vw, 50px); }
     .count { font-size: clamp(20px, 1.4vw, 28px); min-width: 3em; }
 
-    .lock, .done { margin-top: 3.5vh; }
-    .lock-label { font-size: clamp(13px, .85vw, 17px); margin-bottom: 1.2vh; }
+    .desc, .choose, .lock, .done { margin-top: 3vh; }
+    .desc-label { font-size: clamp(13px, .85vw, 17px); margin-bottom: 1vh; }
+    .desc-text { font-size: clamp(15px, 1.05vw, 20px); line-height: 1.55; }
+    .desc-list { margin-top: 2vh; }
+    .desc-list li { padding: 1.1vh 0; font-size: clamp(14px, .95vw, 18px); }
+    .lock-head { margin-bottom: 1.2vh; }
+    .lock-label, .back { font-size: clamp(13px, .85vw, 17px); }
     .lock form { gap: 1.2vh; }
     .field { height: clamp(50px, 6vh, 68px); font-size: clamp(15px, 1vw, 20px); padding: 0 clamp(14px, 1vw, 20px); }
     .msg { font-size: clamp(13px, .85vw, 16px); }
@@ -220,7 +236,7 @@
     .note { font-size: clamp(12px, .8vw, 15px); }
     .ok { font-size: clamp(14px, 1vw, 19px); }
     .note, .ok { text-align: left; }
-    .site-foot { flex: none; margin-top: 4vh; font-size: clamp(12px, .8vw, 15px); }
+    .site-foot { flex: none; margin-top: 3vh; font-size: clamp(12px, .8vw, 15px); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -249,8 +265,6 @@
 
   <div class="layout">
   <div class="col-media">
-  <nav class="tabs" id="tabs" aria-label="Kategori ebook"></nav>
-
   <section class="carousel" aria-label="Pilih ebook, geser ke kiri atau kanan">
     <div class="track" id="track"></div>
   </section>
@@ -276,8 +290,19 @@
     </div>
   </div>
 
+  <div class="desc" id="desc">
+    <p class="desc-label">Tentang ebook ini</p>
+    <p class="desc-text" id="pdesc"></p>
+    <ul class="desc-list" id="ppoints"></ul>
+  </div>
+
+  <button type="button" class="buy choose" id="chooseBtn">Pilih ebook ini</button>
+
   <div class="lock" id="lock">
-    <p class="lock-label">Isi data untuk membuka ebook</p>
+    <div class="lock-head">
+      <p class="lock-label">Isi data untuk membuka ebook</p>
+      <button type="button" class="back" id="backBtn">Kembali</button>
+    </div>
     <form id="unlockForm" novalidate>
       <input class="field" id="name" name="name" type="text" placeholder="Nama lengkap" autocomplete="name" required>
       <input class="field" id="wa" name="wa" type="tel" placeholder="Nomor WhatsApp aktif" autocomplete="tel" inputmode="tel" required>
@@ -303,6 +328,7 @@
   /* ===== KONFIGURASI ===== */
   // Daftar ebook. "cover" opsional: jika kosong, tampil cover buku cadangan
   // (isi "colors" untuk warnanya). Ebook di posisi tengah tampil pertama kali.
+  // "desc" = deskripsi singkat, "points" = 3 poin isi ebook (tampil sebelum form).
   // Link langsung ke ebook tertentu: tambahkan ?ebook=<id> di URL,
   // misalnya .../index.html?ebook=roadmap-jabfung
   const EBOOKS = [
@@ -311,7 +337,8 @@
       title: "From Zero to Published",
       subtitle: "Tahapan menjadi penulis jurnal internasional",
       meta: "PDF · Publikasi",
-      cat: "publikasi",
+      desc: "Peta jalan publikasi dari titik nol: menemukan ide riset, merancang metodologi, menulis draft IMRAD, submission, menjawab reviewer, hingga LoA dan academic branding. Cocok untuk mahasiswa, dosen, dan peneliti yang ingin menembus jurnal internasional.",
+      points: ["Teknik Gap Finder untuk menemukan ide riset", "Menulis draft IMRAD ala jurnal internasional", "Teknik R3 untuk menjawab komentar reviewer"],
       cover: "cover-from-zero.webp",
       link: "https://drive.google.com/file/d/1syij8LL2aip4wmb7XfowlHVOnQQ0ZNd9/view?usp=sharing",
     },
@@ -319,8 +346,9 @@
       id: "dosen-level-up",
       title: "Dosen Level Up",
       subtitle: "Panduan publikasi SINTA & Scopus",
-      meta: "PDF · Publikasi",
-      cat: "publikasi",
+      meta: "PDF · 18 halaman · Publikasi",
+      desc: "Panduan praktis bagi dosen yang ingin naik level lewat publikasi di jurnal SINTA dan Scopus: peta jurnal SINTA 1–6 dan Q1–Q4, struktur artikel layak terbit, etika publikasi, studi kasus, serta checklist sebelum submit.",
+      points: ["Perbedaan jurnal SINTA dan Scopus", "Tujuh komponen artikel layak terbit", "Tools dan checklist sebelum submit"],
       cover: "cover-dosen-level-up.webp",
       link: "https://drive.google.com/file/d/1dt8JF0vlazUM2nEv4lzWVDGK6Rf-FAPw/view?usp=sharing",
     },
@@ -329,7 +357,8 @@
       title: "Prompt Tesis & Skripsi",
       subtitle: "Kumpulan prompt Bab I–V",
       meta: "PDF · Prompt",
-      cat: "prompt",
+      desc: "Lima prompt AI siap pakai untuk menyusun Bab I hingga Bab V tesis atau skripsi. Setiap prompt memuat struktur, target panjang, dan aturan agar AI tidak mengarang data atau referensi.",
+      points: ["Prompt Bab I: pendahuluan dan research gap", "Prompt kajian pustaka dan kerangka pemikiran", "Prompt metode, hasil, pembahasan, dan penutup"],
       cover: "cover-tesis.webp",
       link: "https://drive.google.com/file/d/1m43D_3zPtBYRAgl4Zm2bQovebnwCdIAk/view?usp=sharing",
     },
@@ -337,18 +366,12 @@
       id: "roadmap-jabfung",
       title: "Roadmap Jabfung Dosen 2026",
       subtitle: "Menuju Lektor, Lektor Kepala hingga Profesor",
-      meta: "PDF · Karier Dosen",
-      cat: "karier",
+      meta: "PDF · 26 halaman · Karier Dosen",
+      desc: "Panduan strategis bagi dosen baru, Asisten Ahli, Lektor, dan Lektor Kepala untuk menyusun kenaikan jabatan fungsional secara terarah, mulai dari memahami angka kredit dan publikasi sampai rencana per jenjang.",
+      points: ["Audit kesiapan Jabfung dalam 20 menit", "Roadmap per jenjang hingga Profesor", "Workbook gap calculator dan rencana 90 hari"],
       cover: "cover-roadmap-jabfung.webp",
       link: "https://drive.google.com/file/d/1iECW3icaE6fTAdxU8EPdebDtWGskt9NP/view?usp=sharing",
     },
-  ];
-
-  const TABS = [
-    { key: "all", label: "Semua" },
-    { key: "prompt", label: "Prompt" },
-    { key: "publikasi", label: "Publikasi" },
-    { key: "karier", label: "Karier Dosen" },
   ];
 
   // URL Web App Google Apps Script untuk menyimpan data peserta. Kosongkan jika belum dipasang.
@@ -357,16 +380,16 @@
 
   const $ = (id) => document.getElementById(id);
   const track = $("track");
-  const tabsEl = $("tabs");
   const pname = $("pname"), psub = $("psub"), pmeta = $("pmeta");
+  const pdesc = $("pdesc"), ppoints = $("ppoints");
+  const chooseBtn = $("chooseBtn"), backBtn = $("backBtn");
   const countEl = $("count"), prevBtn = $("prev"), nextBtn = $("next");
   const openLink = $("openLink");
   const form = $("unlockForm"), msg = $("msg"), btn = $("submitBtn");
   const nameEl = $("name"), waEl = $("wa"), instEl = $("inst");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let tab = "all";
-  let list = EBOOKS.slice();
+  const list = EBOOKS.slice();
   let active = 0;
 
   $("badge").textContent = EBOOKS.length;
@@ -374,12 +397,6 @@
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  }
-
-  function renderTabs() {
-    tabsEl.innerHTML = TABS.map((t) =>
-      `<button type="button" class="tab" data-k="${t.key}" aria-pressed="${t.key === tab}">${esc(t.label)}</button>`
-    ).join("");
   }
 
   function renderTrack(preferId) {
@@ -412,6 +429,10 @@
     pname.textContent = b.title;
     psub.textContent = b.subtitle;
     pmeta.textContent = b.meta;
+    pdesc.textContent = b.desc || "";
+    ppoints.innerHTML = (b.points || []).map((p, n) =>
+      `<li><span>${String(n + 1).padStart(2, "0")}</span>${esc(p)}</li>`
+    ).join("");
     countEl.textContent = `${i + 1}/${list.length}`;
     prevBtn.disabled = i === 0;
     nextBtn.disabled = i === list.length - 1;
@@ -450,18 +471,19 @@
   prevBtn.addEventListener("click", () => go(active - 1));
   nextBtn.addEventListener("click", () => go(active + 1));
 
-  tabsEl.addEventListener("click", (e) => {
-    const t = e.target.closest(".tab");
-    if (!t || t.dataset.k === tab) return;
-    const keepId = list[active] && list[active].id;
-    tab = t.dataset.k;
-    list = tab === "all" ? EBOOKS.slice() : EBOOKS.filter((b) => b.cat === tab);
-    renderTabs();
-    renderTrack(keepId);
-  });
-
-  renderTabs();
   renderTrack(new URLSearchParams(location.search).get("ebook"));
+
+  // "Pilih ebook ini" → deskripsi diganti form isi data; "Kembali" → deskripsi lagi
+  chooseBtn.addEventListener("click", () => {
+    document.body.classList.add("is-form");
+    nameEl.focus();
+  });
+  backBtn.addEventListener("click", () => {
+    document.body.classList.remove("is-form");
+    msg.textContent = "";
+    [nameEl, waEl, instEl].forEach((el) => el.classList.remove("invalid"));
+    chooseBtn.focus();
+  });
 
   /* ===== Form ===== */
   function normalizeWA(raw) {
@@ -513,6 +535,7 @@
       } else {
         console.warn("[Ebook] FORM_ENDPOINT belum diisi. Data tidak tersimpan.", payload);
       }
+      document.body.classList.remove("is-form");
       document.body.classList.add("is-open");
     } catch (err) {
       console.error("[Ebook] gagal kirim:", err);
